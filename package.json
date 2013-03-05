@@ -1,0 +1,43 @@
+{
+	"name": "starttls",
+	"description": "Upgrade a regular `net.Stream` connection to a secure `tls` connection.",
+	"version": "0.1.0",
+	"main": "index.js",
+	"homepage": "https://github.com/mattcg/starttls",
+	"implements": ["CommonJS/Modules/1.0"],
+	"contributors": [
+		{
+			"name": "Nathan Rajlich",
+			"email": "nathan@tootallnate.net"
+		},
+		{
+			"name": "Andris Reinman",
+			"email": "andris.reinman@gmail.com"
+		},
+		{
+			"name": "Matthew Caruana Galizia",
+			"email": "m@m.cg"
+		}
+	],
+	"keywords": [
+		"tls", "stream", "net", "upgrade", "ssl"
+	],
+	"bugs": {
+		"url": "https://github.com/mattcg/starttls/issues"
+	},
+	"repositories": [
+		{
+			"type": "git",
+			"url": "https://github.com/mattcg/starttls.git"
+		}
+	],
+	"engines": {
+		"node": "0.x"
+	},
+	"licenses": [
+		{
+			"type": "MIT",
+			"url": "http://opensource.org/licenses/MIT"
+		}
+	]
+}
