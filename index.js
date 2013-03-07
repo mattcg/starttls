@@ -19,29 +19,29 @@ var tls = require('tls');
 var crypto = require('crypto');
 
 exports.startTls = function(socket, onSecure) {
-	var credentials, securePair, clearTextStream;
+	var credentials, securePair, clearText;
 
 	socket.ondata = null;
 	socket.removeAllListeners('data');
 	credentials = crypto.createCredentials();
 	securePair = tls.createSecurePair(credentials, false);
 
-	clearTextStream = pipe(securePair, socket);
+	clearText = pipe(securePair, socket);
 
 	securePair.on('secure', function() {
 		var verifyError = securePair.ssl.verifyError();
 
 		if (verifyError) {
-			clearTextStream.authorized = false;
-			clearTextStream.authorizationError = verifyError;
+			clearText.authorized = false;
+			clearText.authorizationError = verifyError;
 		} else {
-			clearTextStream.authorized = true;
+			clearText.authorized = true;
 		}
 
 		onSecure();
 	});
 
-	clearTextStream._controlReleased = true;
+	clearText._controlReleased = true;
 
 	return securePair;
 };
@@ -71,26 +71,27 @@ function removeEvents(map, emitterSource) {
 }
 
 function pipe(securePair, socket) {
-	var clearTextStream, onError, onClose, eventsMap;
+	var clearText, onError, onClose, eventsMap;
 
 	securePair.encrypted.pipe(socket);
 	socket.pipe(securePair.encrypted);
 
 	securePair.fd = socket.fd;
 
-	clearTextStream = securePair.cleartext;
+	clearText = securePair.cleartext;
 
-	clearTextStream.socket = socket;
-	clearTextStream.encrypted = securePair.encrypted;
-	clearTextStream.authorized = false;
+	clearText.socket = socket;
+	clearText.encrypted = securePair.encrypted;
+	clearText.authorized = false;
 
-	onError = function(e) {
-		if (clearTextStream._controlReleased) {
-			clearTextStream.emit('error', e);
+	// Forward event emissions from the socket to the clear text stream
+	eventsMap = forwardEvents(['timeout', 'end', 'drain'], socket, clearText);
+
+	onError = function(err) {
+		if (clearText._controlReleased) {
+			clearText.emit('error', err);
 		}
 	};
-
-	eventsMap = forwardEvents(['timeout', 'end', 'close', 'drain', 'error'], socket, clearTextStream);
 
 	onClose = function() {
 		socket.removeListener('error', onError);
@@ -101,5 +102,10 @@ function pipe(securePair, socket) {
 	socket.on('error', onError);
 	socket.on('close', onClose);
 
-	return clearTextStream;
+	// It's possible for a SecurePair to emit an 'error' event (see SecurePair.prototype.error in tls.js in at least node v0.8.21).
+	securePair.on('error', function(err) {
+		clearText.emit('error', err);
+	});
+
+	return clearText;
 }
