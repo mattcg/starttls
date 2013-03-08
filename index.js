@@ -106,10 +106,9 @@ function pipe(securePair, socket) {
 	socket.on('error', onError);
 	socket.on('close', onClose);
 
-	// It's possible for a SecurePair to emit an 'error' event (see SecurePair.prototype.error in tls.js in at least node v0.8.21).
-	securePair.on('error', function(err) {
-		clearText.emit('error', err);
-	});
+	// It's possible for a SecurePair to emit an 'error' event (see SecurePair.prototype.error in tls.js in at least node v0.8.21). This happens when a server closes the connection prematurely.
+	securePair.on('error', onError);
+	securePair.encrypted.on('error', onError);
 
 	return clearText;
 }
