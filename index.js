@@ -40,7 +40,7 @@ exports.startTls = function(socket, onSecure) {
 		}
 
 		// The callback parameter is optional
-		if (onSecure)
+		if (onSecure) {
 			onSecure();
 		}
 	});
