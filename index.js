@@ -31,6 +31,7 @@ exports.startTls = function(socket, onSecure) {
 	securePair.on('secure', function() {
 		var verifyError = securePair.ssl.verifyError();
 
+		// A cleartext stream has the boolean property 'authorized' to determine if it was verified by the CA. If 'authorized' is false, a property 'authorizationError' is set on the stream.
 		if (verifyError) {
 			clearText.authorized = false;
 			clearText.authorizationError = verifyError;
@@ -38,7 +39,10 @@ exports.startTls = function(socket, onSecure) {
 			clearText.authorized = true;
 		}
 
-		onSecure();
+		// The callback parameter is optional
+		if (onSecure)
+			onSecure();
+		}
 	});
 
 	clearText._controlReleased = true;
