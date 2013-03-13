@@ -77,19 +77,7 @@ function removeEvents(map, emitterSource) {
 function pipe(securePair, socket) {
 	var clearText, onError, onClose, eventsMap;
 
-	securePair.encrypted.pipe(socket);
-	socket.pipe(securePair.encrypted);
-
-	securePair.fd = socket.fd;
-
 	clearText = securePair.cleartext;
-
-	clearText.socket = socket;
-	clearText.encrypted = securePair.encrypted;
-	clearText.authorized = false;
-
-	// Forward event emissions from the socket to the clear text stream
-	eventsMap = forwardEvents(['timeout', 'end', 'drain'], socket, clearText);
 
 	onError = function(err) {
 		if (clearText._controlReleased) {
@@ -103,12 +91,23 @@ function pipe(securePair, socket) {
 		removeEvents(eventsMap, socket);
 	};
 
+	// Forward event emissions from the socket to the cleartext stream
+	eventsMap = forwardEvents(['timeout', 'end', 'drain'], socket, clearText);
 	socket.on('error', onError);
 	socket.on('close', onClose);
 
-	// It's possible for a SecurePair to emit an 'error' event (see SecurePair.prototype.error in tls.js in at least node v0.8.21). This happens when a server closes the connection prematurely.
-	securePair.on('error', onError);
-	securePair.encrypted.on('error', onError);
+	securePair.on('error', function(err) {
+		onError(err);
+	});
+
+	securePair.encrypted.pipe(socket);
+	socket.pipe(securePair.encrypted);
+
+	securePair.fd = socket.fd;
+
+	clearText.socket = socket;
+	clearText.encrypted = securePair.encrypted;
+	clearText.authorized = false;
 
 	return clearText;
 }
