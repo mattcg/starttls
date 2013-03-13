@@ -2,7 +2,7 @@
 	"name": "starttls",
 	"description": "Upgrade a regular `net.Stream` connection to a secure `tls` connection.",
 	"version": "0.1.5",
-	"main": "index.js",
+	"main": "lib/starttls.js",
 	"homepage": "https://github.com/mattcg/starttls",
 	"implements": ["CommonJS/Modules/1.0"],
 	"contributors": [
