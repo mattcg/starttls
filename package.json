@@ -1,7 +1,7 @@
 {
 	"name": "starttls",
 	"description": "Upgrade a regular `net.Stream` connection to a secure `tls` connection.",
-	"version": "0.1.6",
+	"version": "0.1.7",
 	"main": "lib/starttls.js",
 	"homepage": "https://github.com/mattcg/starttls",
 	"implements": ["CommonJS/Modules/1.0"],
@@ -25,12 +25,10 @@
 	"bugs": {
 		"url": "https://github.com/mattcg/starttls/issues"
 	},
-	"repositories": [
-		{
-			"type": "git",
-			"url": "https://github.com/mattcg/starttls.git"
-		}
-	],
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/mattcg/starttls.git"
+	},
 	"engines": {
 		"node": "0.x"
 	},
