@@ -26,6 +26,18 @@ socket.on('connect', function() {
 
 The callback receives `null` or an error object as the first argument. The only kind of error supported so far is a verification error, which results when the certificate authority failed to verify the certificate.
 
+To avoid man-in-the-middle attacks you should also check the server identity.
+
+```javascript
+starttls(socket, function(err) {
+	if (!tls.checkServerIdentity(host, this.cleartext.getPeerCertificate())) {
+
+		// Hostname mismatch!
+		// Report error and end connection...
+	}
+});
+```
+
 ## License ##
 
 Portions of this code copyright (c) 2012, Andris Reinman and copyright (c) 2011, Nathan Rajlich.
