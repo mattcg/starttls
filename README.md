@@ -24,6 +24,8 @@ socket.on('connect', function() {
 });
 ```
 
+The callback receives `null` or an error object as the first argument. The only kind of error supported so far is a verification error, which results when the certificate authority failed to verify the certificate.
+
 ## License ##
 
 Portions of this code copyright (c) 2012, Andris Reinman and copyright (c) 2011, Nathan Rajlich.

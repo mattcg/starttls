@@ -12,19 +12,21 @@
 
 var assert = require('assert');
 var net = require('net');
+var tls = require('tls');
+
 var starttls = require('../lib/starttls');
 
 suite('starttls tests', function() {
-	var socket;
+	var socket, host = 'www.google.com', port = 443;
 
 	setup(function() {
 		socket = net.createConnection({
-			port: 443,
-			host: 'www.example.com'
+			port: port,
+			host: host
 		});
 	});
 
-	test('', function(done) {
+	test('simple connect test', function(done) {
 		socket.on('connect', function() {
 			var pair;
 
@@ -34,6 +36,23 @@ suite('starttls tests', function() {
 				assert.ifError(pair.cleartext.authorizationError);
 
 				//pair.cleartext.write();
+				done();
+			});
+		});
+	});
+
+	test('identity check test', function(done) {
+		socket.on('connect', function() {
+			var pair;
+
+			pair = starttls(socket, function(err) {
+				var cert;
+
+				cert = pair.cleartext.getPeerCertificate();
+
+				assert.equal(tls.checkServerIdentity(host, cert), true);
+				assert.equal(tls.checkServerIdentity('www.facebook.com', cert), false);
+
 				done();
 			});
 		});
