@@ -12,7 +12,7 @@
 
 var assert = require('assert');
 var net = require('net');
-var starttls = require('../lib/starttls').startTls;
+var starttls = require('../lib/starttls');
 
 suite('starttls tests', function() {
 	var socket;
@@ -28,7 +28,8 @@ suite('starttls tests', function() {
 		socket.on('connect', function() {
 			var pair;
 
-			pair = starttls(socket, function() {
+			pair = starttls(socket, function(err) {
+				assert.ifError(err);
 				assert(pair.cleartext.authorized);
 				assert.ifError(pair.cleartext.authorizationError);
 

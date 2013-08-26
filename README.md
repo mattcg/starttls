@@ -6,16 +6,19 @@ Based on a version by [Andris Reinman](https://github.com/andris9/rai/blob/maste
 
 ## Usage ##
 
-The only method, `startTls`, returns a [`SecurePair`](http://nodejs.org/api/tls.html#tls_class_securepair) and takes a [`Socket`](http://nodejs.org/api/net.html#net_class_net_socket) and an optional callback called on the [`secure`](http://nodejs.org/api/tls.html#tls_event_secure) event of the pair.
+This library returns a [`SecurePair`](http://nodejs.org/api/tls.html#tls_class_securepair) and takes a [`Socket`](http://nodejs.org/api/net.html#net_class_net_socket) and an optional callback called on the [`secure`](http://nodejs.org/api/tls.html#tls_event_secure) event of the pair.
 
 ```javascript
 var net = require('net');
-var startTls = require('starttls').startTls;
-var port = 21;
-var socket = net.createConnection(port);
+var starttls = require('starttls');
+
+var socket = net.createConnection({
+	port: 21,
+	host: example.com
+});
 
 socket.on('connect', function() {
-	var securePair = startTls(socket, function() {
+	var securePair = starttls(socket, function(err) {
 		securePair.cleartext.write('garbage');
 	});
 });
