@@ -35,7 +35,8 @@ suite('starttls tests', function() {
 				assert(pair.cleartext.authorized);
 				assert.ifError(pair.cleartext.authorizationError);
 
-				//pair.cleartext.write();
+				assert.equal(this, pair);
+
 				done();
 			});
 		});
