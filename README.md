@@ -8,9 +8,6 @@ Based on a version by [Andris Reinman](https://github.com/andris9/rai/blob/maste
 
 This library has one method and accepts either an options hash or a prepared socket as the first argument. It returns a [`SecurePair`](http://nodejs.org/api/tls.html#tls_class_securepair).
 
-The `onSecure` callback is  optional and receives `null` or an error object as the first argument (see below for error cases). Within the callback context, `this` refers to the same [`SecurePair`](http://nodejs.org/api/tls.html#tls_class_securepair) object returned by `starttls`.
-
-
 ### starttls(options, [onSecure]), starttls(socket, [onSecure]) ###
 
 The following options are supported:
@@ -19,6 +16,8 @@ The following options are supported:
 - `host` - used to perform automatic certificate identity checking, to guard against MITM attacks
 - `port` - only used to create a socket (along with the `host` option) if `socket` is not provided
 - `pair` - if you want to provide your own [`SecurePair`](http://nodejs.org/api/tls.html#tls_class_securepair) object
+
+The `onSecure` callback is  optional and receives `null` or an error object as the first argument (see below for error cases). Within the callback context, `this` refers to the same [`SecurePair`](http://nodejs.org/api/tls.html#tls_class_securepair) object returned by `starttls`.
 
 ```javascript
 var net = require('net');
@@ -47,7 +46,7 @@ You should always check for an error before writing to the stream to avoid man-i
 - the certificate authority authorization check failed or was negative
 - the server identity check was negative
 
-If you only pass a socket object, server identity checking will not be performed automatically. In that case you should perform the check manually, to avoid man-in-the-middle attacks.
+If you only pass a socket object, server identity checking will not be performed automatically. In that case you should perform the check manually.
 
 ```javascript
 starttls(socket, function(err) {
