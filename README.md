@@ -15,7 +15,7 @@ The `onSecure` callback is  optional and receives `null` or an error object as t
 
 The following options are supported:
 
-- `socket` - if not provided, a socket will be created using `net.createConnection`](http://nodejs.org/api/net.html#net_net_createconnection_options_connectionlistener)
+- `socket` - if not provided, a socket will be created using [`net.createConnection`](http://nodejs.org/api/net.html#net_net_createconnection_options_connectionlistener)
 - `host` - used to perform automatic certificate identity checking, to guard against MITM attacks
 - `port` - only used to create a socket (along with the `host` option) if `socket` is not provided
 - `pair` - if you want to provide your own [`SecurePair`](http://nodejs.org/api/tls.html#tls_class_securepair) object
