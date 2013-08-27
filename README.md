@@ -1,5 +1,7 @@
 # Start TLS #
 
+[![Build Status](https://travis-ci.org/mattcg/starttls.png?branch=master)](https://travis-ci.org/mattcg/starttls)
+
 Upgrade a regular [`net.Stream`](http://nodejs.org/api/net.html#net_class_net_socket) connection to a secure [`tls`](http://nodejs.org/api/tls.html) connection.
 
 Based on code by [Andris Reinman](https://github.com/andris9/rai/blob/master/lib/starttls.js), itself based on an older version by [Nathan Rajlich](https://gist.github.com/TooTallNate/848444).
