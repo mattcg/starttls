@@ -9,6 +9,7 @@
 'use strict';
 
 /*jshint node:true*/
+/*global test, suite*/
 
 var assert = require('assert');
 var net = require('net');
@@ -17,45 +18,113 @@ var tls = require('tls');
 var starttls = require('../lib/starttls');
 
 suite('starttls tests', function() {
-	var socket, host = 'www.google.com', port = 443;
+	var options;
 
-	setup(function() {
-		socket = net.createConnection({
-			port: port,
-			host: host
-		});
-	});
+	options = {
+		host: 'www.google.com',
+		port: 443
+	};
 
-	test('simple connect test', function(done) {
-		socket.on('connect', function() {
+	test('simple connect with prepared socket', function(done) {
+		net.createConnection(options, function() {
 			var pair;
 
-			pair = starttls(socket, function(err) {
+			pair = starttls(this, function(err) {
 				assert.ifError(err);
 				assert(pair.cleartext.authorized);
 				assert.ifError(pair.cleartext.authorizationError);
 
-				assert.equal(this, pair);
+				assert(this === pair);
 
 				done();
 			});
 		});
 	});
 
-	test('identity check test', function(done) {
-		socket.on('connect', function() {
+	test('identity check with prepared socket', function(done) {
+		net.createConnection(options, function() {
 			var pair;
 
-			pair = starttls(socket, function(err) {
+			pair = starttls(this, function(err) {
 				var cert;
 
 				cert = pair.cleartext.getPeerCertificate();
 
-				assert.equal(tls.checkServerIdentity(host, cert), true);
+				assert.equal(tls.checkServerIdentity(options.host, cert), true);
 				assert.equal(tls.checkServerIdentity('www.facebook.com', cert), false);
 
 				done();
 			});
+		});
+	});
+
+	test('simple connect with options and prepared socket', function(done) {
+		var socket;
+
+		socket = starttls({
+			socket: net.createConnection(options)
+		}, function(err) {
+			var pair = this;
+
+			assert.ifError(err);
+
+			assert(pair.cleartext);
+			assert(pair.cleartext.authorized);
+			assert.ifError(pair.cleartext.authorizationError);
+
+			done();
+		});
+
+		assert(socket instanceof net.Socket);
+	});
+
+	test('simple connect with options', function(done) {
+		var socket;
+
+		socket = starttls(options, function(err) {
+			var pair = this;
+
+			assert.ifError(err);
+
+			assert(pair.cleartext);
+			assert(pair.cleartext.authorized);
+			assert.ifError(pair.cleartext.authorizationError);
+
+			done();
+		});
+
+		assert(socket instanceof net.Socket);
+	});
+
+	test('host is checked', function(done) {
+		var options;
+
+		options = {
+
+			// Take advantage of the fact that this domain has an SSL certificate error.
+			host: 'www.example.com',
+			port: 443
+		};
+
+		starttls(options, function(err) {
+			assert(err);
+			assert.equal(err.message, 'Server identity mismatch: invalid certificate for ' + options.host + '.');
+
+			done();
+		});
+	});
+
+	test('host is checked even if socket is provided', function(done) {
+		var falseHost = 'www.facebook.com';
+
+		starttls({
+			host: falseHost,
+			socket: net.createConnection(options)
+		}, function(err) {
+			assert(err);
+			assert.equal(err.message, 'Server identity mismatch: invalid certificate for ' + falseHost + '.');
+
+			done();
 		});
 	});
 });
