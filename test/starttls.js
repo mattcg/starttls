@@ -59,9 +59,7 @@ suite('starttls tests', function() {
 	});
 
 	test('simple connect with options and prepared socket', function(done) {
-		var socket;
-
-		socket = starttls({
+		starttls({
 			socket: net.createConnection(options)
 		}, function(err) {
 			var pair = this;
@@ -74,14 +72,10 @@ suite('starttls tests', function() {
 
 			done();
 		});
-
-		assert(socket instanceof net.Socket);
 	});
 
 	test('simple connect with options', function(done) {
-		var socket;
-
-		socket = starttls(options, function(err) {
+		starttls(options, function(err) {
 			var pair = this;
 
 			assert.ifError(err);
@@ -92,8 +86,6 @@ suite('starttls tests', function() {
 
 			done();
 		});
-
-		assert(socket instanceof net.Socket);
 	});
 
 	test('host is checked', function(done) {
