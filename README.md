@@ -8,11 +8,11 @@ Based on a version by [Andris Reinman](https://github.com/andris9/rai/blob/maste
 
 This library has one method and accepts either an options hash or a prepared socket as the first argument.
 
-The `onSecure` callback is always optional and receives `null` or an error object as the first argument. The only kind of error supported so far is a verification error, which results when the certificate authority failed to verify the certificate.
+The `onSecure` callback is always optional and receives `null` or an error object as the first argument (see below for error cases). Within the callback context, `this` refers to a [`SecurePair`](http://nodejs.org/api/tls.html#tls_class_securepair) object.
 
 ### starttls(options, [onSecure]) ###
 
-When provided an options hash, `starttls` creates a socket by passing the hash to [`net.createConnection`](http://nodejs.org/api/net.html#net_net_createconnection_options_connectionlistener), starts the connection and returns the created socket.
+When provided with an options hash, `starttls` creates a socket by passing the hash to [`net.createConnection`](http://nodejs.org/api/net.html#net_net_createconnection_options_connectionlistener), starts the connection and returns the created socket.
 
 ```javascript
 var starttls = require('starttls');
@@ -31,7 +31,7 @@ starttls({
 });
 ```
 
-Note the first argument is non-null in the following cases:
+Note that the first argument is non-null in the following cases:
 
 - the certificate authority authorization check failed or was negative
 - the server identity check was negative
@@ -58,13 +58,33 @@ net.createConnection({
 });
 ```
 
-To avoid man-in-the-middle attacks you should also check the server identity. This check is performed automatically if you pass an options hash with a `host` property to `starttls`.
+To avoid man-in-the-middle attacks you should also check the server identity. This check is only performed automatically if you pass an options hash with a `host` property to `starttls`.
 
 ```javascript
 starttls(socket, function(err) {
 	if (!tls.checkServerIdentity(host, this.cleartext.getPeerCertificate())) {
 
 		// Hostname mismatch!
+		// Report error and end connection...
+	}
+});
+```
+
+If you still want automatic identity checking but want to pass your own socket object, provide the socket in the options hash:
+
+```javascript
+var socket = net.createConnection({
+		host: host,
+		port: port
+	});
+
+starttls({
+	host: host,
+	socket: socket
+}, function(err) {
+	if (err) {
+
+		// CA autorization error or hostname mismatch!
 		// Report error and end connection...
 	}
 });
