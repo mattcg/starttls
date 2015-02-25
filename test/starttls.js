@@ -46,12 +46,16 @@ suite('starttls tests', function() {
 			var pair;
 
 			pair = starttls(this, function(err) {
-				var cert;
+				var cert, check;
 
 				cert = pair.cleartext.getPeerCertificate();
 
-				assert.equal(tls.checkServerIdentity(options.host, cert), true);
-				assert.equal(tls.checkServerIdentity('www.facebook.com', cert), false);
+				// Returns error or undefined on node v0.12.0 and true or false on previous versions.
+				check = tls.checkServerIdentity(options.host, cert);
+				assert.equal(check === true || typeof check === 'undefined', true);
+
+				check = tls.checkServerIdentity('www.facebook.com', cert);
+				assert.equal(check === false || check instanceof Error, true);
 
 				done();
 			});
@@ -94,14 +98,12 @@ suite('starttls tests', function() {
 		options = {
 
 			// Take advantage of the fact that this domain has an SSL certificate error.
-			host: 'www.example.com',
+			host: 'projects.icij.org.s3.amazonaws.com',
 			port: 443
 		};
 
 		starttls(options, function(err) {
 			assert(err);
-			assert.equal(err.message, 'Server identity mismatch: invalid certificate for ' + options.host + '.');
-
 			done();
 		});
 	});
@@ -114,8 +116,6 @@ suite('starttls tests', function() {
 			socket: net.createConnection(options)
 		}, function(err) {
 			assert(err);
-			assert.equal(err.message, 'Server identity mismatch: invalid certificate for ' + falseHost + '.');
-
 			done();
 		});
 	});
